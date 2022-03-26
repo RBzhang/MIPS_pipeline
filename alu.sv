@@ -27,7 +27,8 @@ always@(*)begin
     `ALUNEQ:  out <= (alu1 == alu2) ? 0 : 1;
     `ALUXOR:  out <= (alu1 ^ alu2);
     `ALUNOR:  out <= ~(alu1 | alu2);
+    default: out <= 32'b0;
     endcase
 end
-zero = (aluctr == `ALUEQU && out == 1) | (aluctr == `ALUNEQ && out == 0);
+assign zero = (out == 32'b1) && (aluctr == `ALUEQU || aluctr == `ALUNEQ);
 endmodule

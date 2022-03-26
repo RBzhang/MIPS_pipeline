@@ -3,7 +3,7 @@
 module register_file(
     input wire clk, 
     input wire RegWrite,
-    input wire [4:0] rs, rt,rd,
+    input wire [4:0] rs, rt,
     input wire [4:0] we,
     input wire [`DATA_WIDTH-1:0] w_data,
     output wire [`DATA_WIDTH-1:0] r_data1, r_data2,
@@ -23,8 +23,8 @@ always@(posedge clk)begin
         register[we] <= w_data;
     end
 end
-assign r_data1 = data[rs];
-assign r_data2 = data[rt];
+assign r_data1 = (rs == we) ? w_data : register[rs];
+assign r_data2 = (rt == we) ? w_data : register[rt];
 
 
 endmodule

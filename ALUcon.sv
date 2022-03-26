@@ -18,7 +18,7 @@ always@(*)begin
     6'b100001: aluctr <= `ALUADDU;
     6'b100010: aluctr <= `ALUSUB;
     6'b100100: aluctr <= `ALUAND;
-    6'b100101: aluctr < `ALUOR;
+    6'b100101: aluctr <= `ALUOR;
     6'b100111: aluctr <= `ALUNOR;
     6'b101010: aluctr <= `ALUSLT;
     6'b101011: aluctr <= `ALUSLTU;

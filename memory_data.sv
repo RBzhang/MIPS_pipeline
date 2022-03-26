@@ -1,7 +1,7 @@
 `include "define.sv"
 
 module memory_data(
-    input wire clk, rst,
+    input wire clk,
     input wire MemRead, MemWrite,
     input wire [`ADR_WIDTH-1:0] addr,
     input wire [`DATA_WIDTH-1:0] data_write,
@@ -9,11 +9,11 @@ module memory_data(
 );
 reg [`DATA_WIDTH-1:0] mem[63:0];
 
-assign (MemRead == 1'b1) ? data_read = mem[addr] : 32'Hxxxxxxxx;
+assign data_read = (MemRead == 1'b1) ? mem[addr[7:2]] : 32'Hxxxxxxxx;
 
 always@(posedge clk)begin
-    if(MemWrite == 1'b1 && rst == `RST_VALID)begin
-        mem[addr] <= data_write;
+    if(MemWrite == 1'b1)begin
+        mem[addr[7:2]] <= data_write;
     end
 end
 

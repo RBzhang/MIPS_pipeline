@@ -10,8 +10,8 @@ module pc_new(
     output reg [`ADR_WIDTH-1:0] o_pc
 );
 wire [`ADR_WIDTH-1:0] pc_mid , pc_out;
-assign pc_mid = (i_valid == `VALID_EN) ? imme : i_pc;
-assign pc_out = (jump == 1'b1) ? pc_mid : addr;
+assign pc_mid = (i_valid == `VALID_EN) ? imme : (i_pc);
+assign pc_out = (jump == 1'b1) ? addr : pc_mid;
 always @(posedge clk) begin
     if(rst == `RST_VALID)begin
         o_pc <= '0;
