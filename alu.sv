@@ -20,9 +20,9 @@ always@(*)begin
     `ALUSUB: out <= alu1 - alu2;
     `ALUSLT: out <= (salu1 < salu2) ? 1 : 0;
     `ALUSLTU:out <= (alu1 < alu2) ? 1 : 0;
-    `ALUSLL : out <= (alu1 << alu2);
-    `ALUSRL:  out <= (alu1 >> alu2);
-    `ALUSRA:  out <= (salu1 >>> alu2);
+    `ALUSLL : out <= (alu1 << alu2[4:0]);
+    `ALUSRL:  out <= (alu1 >> alu2[4:0]);
+    `ALUSRA:  out <= (salu1 >>> salu2[4:0]);
     `ALUEQU:  out <= (alu1 == alu2) ? 1 : 0;
     `ALUNEQ:  out <= (alu1 == alu2) ? 0 : 1;
     `ALUXOR:  out <= (alu1 ^ alu2);

@@ -16,12 +16,14 @@ wire [`ADR_WIDTH-1:0]  pc;
 wire [`ADR_WIDTH-1:0] pc_4_if , pc_4_id,pc_imme, pc_4_ex;
 wire is_stop , memread_ex;
 wire [4:0] rd_ex_id;
+// wire [`DATA_WIDTH-1:0] J_addr;
 assign code_out = code;
 assign pc_out = pc;
 assign pc_4_if = (is_stop == 1'b1) ? pc : (pc + 4'H4);
+// assign J_addr = (code[31:26] == 6'b000010) ? pc_imme : {pc[31:28],{code[25:0],2'b00}};
 pc_new pc_clk(.clk(clk),.rst(rst),.i_valid(PCSrc),.i_pc(pc_4_if),.jump(jump),.imme(pc_imme),.addr(i_jump),.o_pc(pc));
 memory_read i_memory(.pc(pc), .code(code), .o_error(read_error));
-IF_ID if_id(.clk(clk),.rst(rst),.is_stop(is_stop),.i_code(code),.i_pc(pc_4_if),.o_code(code_id),.o_pc(pc_4_id));
+IF_ID if_id(.clk(clk),.rst(rst | jump | PCSrc),.is_stop(is_stop),.i_code(code),.i_pc(pc_4_if),.o_code(code_id),.o_pc(pc_4_id));
 
 wire [5:0] op;
 wire RegWrite_WB;
@@ -58,7 +60,7 @@ wire [2:0] M_ex;
 wire [1:0] WB_ex;
 assign memread_ex = M_ex[1];
 // assign rd_ex_id = rd_ex;
-ID_EX id_ex(.clk(clk),.rst(rst | is_stop),.i_pc(pc_4_if),.i_data1(r_data1),.i_data2(r_data2),.i_imme(imme_id),.i_rt(rt),.i_rd(rd),.i_rs(rs),.i_EX(EX_id),.i_M(M_id),.i_WB(WB_id),.o_pc(pc_4_ex),
+ID_EX id_ex(.clk(clk),.rst(rst | is_stop | jump | PCSrc),.i_pc(pc_4_id),.i_data1(r_data1),.i_data2(r_data2),.i_imme(imme_id),.i_rt(rt),.i_rd(rd),.i_rs(rs),.i_EX(EX_id),.i_M(M_id),.i_WB(WB_id),.o_pc(pc_4_ex),
 .o_data1(r_data1_ex),.o_data2(r_data2_ex),.o_imme(imme_ex),.o_rt(rt_ex),.o_rd(rd_ex),.o_EX(EX_ex),.o_M(M_ex),.o_WB(WB_ex),.o_rs(rs_ex));
 wire [`DATA_WIDTH-1:0] alu1, alu2, aluout, result_mem, result_wb, rt_ex_in;
 wire [4:0] we_ex;
@@ -80,6 +82,7 @@ assign wb_rd = we_wb;
 assign alu2 = (EX_ex[0] == 1'b1) ? imme_ex : rt_ex_in;
 assign we_ex = (EX_ex[5] == 1'b1) ? rd_ex : rt_ex;
 assign pc_imme_ex = pc_4_ex + (imme_ex << 2);
+assign pc_imme = pc_imme_ex;
 select_signal s(.rs(rs_ex), .rt(rt_ex),.RegWrite_mem(WB_mem[1]),.RegWrite_wb(WB_wb[1]),.ex_mem_rd(we_mem),.mem_wb_rd(we_wb),.forwardA(forwardA),.forwardB(forwardB));
 
 alu ALUc(.aluctr(aluctr),.alu1(alu1),.alu2(alu2),.out(aluout),.zero(alu_zero));
@@ -90,14 +93,14 @@ wire [2:0] M_m;
 wire [`ADR_WIDTH-1:0] pc_imme_mem;
 wire alu_zero_mem;
 wire [`DATA_WIDTH-1:0] aluout_mem, r_data2_mem;
-
+assign PCSrc = M_ex[2] & alu_zero;
 assign result_mem = aluout_mem;
 
 EX_MEM ex_mem(.clk(clk),.rst(rst),.i_M(M_ex),.i_WB(WB_ex),.zero_valid(alu_zero),.i_result(aluout),.i_we(we_ex),.i_wdata(rt_ex_in),.i_imme(pc_imme_ex),
 .o_M(M_m),.o_WB(WB_mem),.o_zero_valid(alu_zero_mem),.o_result(aluout_mem),.o_we(we_mem),.o_wdata(r_data2_mem),.o_imme(pc_imme_mem));
 wire [`DATA_WIDTH-1:0] mem_read_mem;
-assign PCSrc = M_m[2] & alu_zero_mem;
-assign pc_imme = pc_imme_mem;
+// assign PCSrc = M_m[2] & alu_zero_mem;
+// assign pc_imme = pc_imme_mem;
 memory_data da_mem(.clk(clk),.MemRead(M_m[1]),.MemWrite(M_m[0]),.addr(aluout_mem),.data_write(r_data2_mem),.data_read(mem_read_mem));
 
 
