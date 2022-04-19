@@ -8,12 +8,14 @@ module ID_EX(
     input wire [5:0] i_EX,
     input wire [2:0] i_M,
     input wire [1:0] i_WB,
+    input wire jal_i,
     output reg [`DATA_WIDTH-1:0] o_pc, o_data1, o_data2,
     output reg [`DATA_WIDTH-1:0] o_imme,
     output reg [4:0] o_rd, o_rt,o_rs,
     output reg [5:0] o_EX,
     output reg [2:0] o_M,
-    output reg [1:0] o_WB
+    output reg [1:0] o_WB,
+    output reg jal_o
 );
 
 always@(posedge clk)begin
@@ -28,6 +30,7 @@ always@(posedge clk)begin
         o_M <= '0;
         o_WB <= '0;
         o_rs <= '0;
+        jal_o <= '0;
     end
         else begin
         o_pc <= i_pc;
@@ -40,6 +43,7 @@ always@(posedge clk)begin
         o_M <= i_M;
         o_WB <= i_WB;
         o_rs <= i_rs;
+        jal_o <= jal_i;
         end
 end
 

@@ -20,6 +20,7 @@ always@(*)begin
     6'b001101: controls <= 12'b011000001000;
     6'b100011: controls <= 12'b011010100100;
     6'b101011: controls <= 12'b001001000100;
+    6'b000011: controls <= 12'b010000010000;
     default: controls <= 12'b000000000000;
     endcase
 end
